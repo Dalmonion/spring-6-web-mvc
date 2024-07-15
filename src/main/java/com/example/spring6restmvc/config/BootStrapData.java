@@ -23,55 +23,67 @@ public class BootStrapData implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        Beer beer1 = Beer.builder()
-                .beerName("Test 1")
-                .beerStyle(BeerStyle.PALE_ALE)
-                .upc("12345")
-                .createdDate(LocalDateTime.now())
-                .updateDate(LocalDateTime.now())
-                .quantityOnHand(123)
-                .price(BigDecimal.valueOf(12.99))
-                .build();
+        loadBeerData();
+        loadCustomerData();
+    }
 
-        Beer beer2 = Beer.builder()
-                .beerName("Test 2")
-                .beerStyle(BeerStyle.LAGER)
-                .upc("67890")
-                .createdDate(LocalDateTime.now())
-                .updateDate(LocalDateTime.now())
-                .quantityOnHand(456)
-                .price(BigDecimal.valueOf(22.19))
-                .build();
+    private void loadBeerData() {
+        if (beerRepository.count() == 0) {
+            Beer beer1 = Beer.builder()
+                    .beerName("Test 1")
+                    .beerStyle(BeerStyle.PALE_ALE)
+                    .upc("12345")
+                    .createdDate(LocalDateTime.now())
+                    .updateDate(LocalDateTime.now())
+                    .quantityOnHand(123)
+                    .price(BigDecimal.valueOf(12.99))
+                    .build();
 
-        Beer beer3 = Beer.builder()
-                .beerName("Test 3")
-                .beerStyle(BeerStyle.GOSE)
-                .upc("123098")
-                .createdDate(LocalDateTime.now())
-                .updateDate(LocalDateTime.now())
-                .quantityOnHand(999)
-                .price(BigDecimal.valueOf(9.99))
-                .build();
+            Beer beer2 = Beer.builder()
+                    .beerName("Test 2")
+                    .beerStyle(BeerStyle.LAGER)
+                    .upc("67890")
+                    .createdDate(LocalDateTime.now())
+                    .updateDate(LocalDateTime.now())
+                    .quantityOnHand(456)
+                    .price(BigDecimal.valueOf(22.19))
+                    .build();
 
-        Customer customer1 = Customer.builder()
-                .customerName("test customer 1")
-                .createdDate(LocalDateTime.now())
-                .modifiedDate(LocalDateTime.now())
-                .build();
+            Beer beer3 = Beer.builder()
+                    .beerName("Test 3")
+                    .beerStyle(BeerStyle.GOSE)
+                    .upc("123098")
+                    .createdDate(LocalDateTime.now())
+                    .updateDate(LocalDateTime.now())
+                    .quantityOnHand(999)
+                    .price(BigDecimal.valueOf(9.99))
+                    .build();
 
-        Customer customer2 = Customer.builder()
-                .customerName("test customer 2")
-                .createdDate(LocalDateTime.now())
-                .modifiedDate(LocalDateTime.now())
-                .build();
+            beerRepository.saveAll(List.of(beer1, beer2, beer3));
+        }
+    }
 
-        Customer customer3 = Customer.builder()
-                .customerName("test customer 3")
-                .createdDate(LocalDateTime.now())
-                .modifiedDate(LocalDateTime.now())
-                .build();
+    private void loadCustomerData() {
+        if (customerRepository.count() == 0) {
+            Customer customer1 = Customer.builder()
+                    .customerName("test customer 1")
+                    .createdDate(LocalDateTime.now())
+                    .modifiedDate(LocalDateTime.now())
+                    .build();
 
-        beerRepository.saveAll(List.of(beer1, beer2, beer3));
-        customerRepository.saveAll(List.of(customer1, customer2, customer3));
+            Customer customer2 = Customer.builder()
+                    .customerName("test customer 2")
+                    .createdDate(LocalDateTime.now())
+                    .modifiedDate(LocalDateTime.now())
+                    .build();
+
+            Customer customer3 = Customer.builder()
+                    .customerName("test customer 3")
+                    .createdDate(LocalDateTime.now())
+                    .modifiedDate(LocalDateTime.now())
+                    .build();
+
+            customerRepository.saveAll(List.of(customer1, customer2, customer3));
+        }
     }
 }
