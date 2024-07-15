@@ -1,5 +1,6 @@
 package com.example.spring6restmvc.service;
 
+import com.example.spring6restmvc.controller.NotFoundException;
 import com.example.spring6restmvc.mapper.CustomerMapper;
 import com.example.spring6restmvc.model.CustomerDTO;
 import com.example.spring6restmvc.repository.CustomerRepository;
@@ -52,8 +53,12 @@ public class CustomerServiceJPA implements CustomerService {
     }
 
     @Override
-    public void deleteBydId(UUID customerId) {
-
+    public Boolean deleteBydId(UUID customerId) {
+        if (customerRepository.existsById(customerId)) {
+            customerRepository.deleteById(customerId);
+            return true;
+        }
+        return false;
     }
 
     @Override
