@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +25,24 @@ class CustomerControllerIT {
 
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Test
+    void testCreateCustomer() {
+        CustomerDTO customerDTO = CustomerDTO.builder()
+                .customerName("new customer name")
+                .build();
+
+        ResponseEntity responseEntity = customerController.createCustomer(customerDTO);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.valueOf(201));
+        assertThat(responseEntity.getHeaders().getLocation()).isNotNull();
+
+        String[] locations = responseEntity.getHeaders().getLocation().getPath().split("/");
+        UUID savedUUID = UUID.fromString(locations[3]);
+
+        Customer savedCustomer = customerRepository.findById(savedUUID).get();
+        assertThat(savedCustomer).isNotNull();
+    }
 
     @Test
     void testGetCustomerById() {
