@@ -1,6 +1,5 @@
 package com.example.spring6restmvc.service;
 
-import com.example.spring6restmvc.controller.NotFoundException;
 import com.example.spring6restmvc.mapper.CustomerMapper;
 import com.example.spring6restmvc.model.CustomerDTO;
 import com.example.spring6restmvc.repository.CustomerRepository;
@@ -37,7 +36,8 @@ public class CustomerServiceJPA implements CustomerService {
 
     @Override
     public CustomerDTO createCustomer(CustomerDTO customer) {
-        return customerMapper.customerToCustomerDto(customerRepository.save(customerMapper.customerDtoToCustomer(customer)));
+        return customerMapper.customerToCustomerDto(customerRepository.save(customerMapper.customerDtoToCustomer(
+                customer)));
     }
 
     @Override
@@ -62,7 +62,16 @@ public class CustomerServiceJPA implements CustomerService {
     }
 
     @Override
-    public void patchCustomerBydId(UUID customerId, CustomerDTO customer) {
-
+    public Optional<CustomerDTO> patchCustomerBydId(UUID customerId, CustomerDTO customer) {
+        AtomicReference<Optional<CustomerDTO>> atomicReference = new AtomicReference<>();
+        customerRepository.findById(customerId).ifPresentOrElse(foundedCustomer -> {
+            if (customer.getCustomerName() != null) {
+                foundedCustomer.setCustomerName(customer.getCustomerName());
+            }
+            atomicReference.set(Optional.of(customerMapper.customerToCustomerDto(customerRepository.save(foundedCustomer))));
+        }, () -> {
+            atomicReference.set(Optional.empty());
+        });
+        return atomicReference.get();
     }
 }

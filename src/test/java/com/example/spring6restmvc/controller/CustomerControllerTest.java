@@ -66,6 +66,8 @@ class CustomerControllerTest {
         CustomerDTO customer = customerServiceImpl.listCustomers().get(0);
         Map<String, Object> customerMap = Map.of("customerName", "new name");
 
+        given(customerService.patchCustomerBydId(any(UUID.class), any(CustomerDTO.class))).willReturn(Optional.of(customer));
+
         mockMvc.perform(patch(CustomerController.CUSTOMER_PATH_ID, customer.getId())
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
