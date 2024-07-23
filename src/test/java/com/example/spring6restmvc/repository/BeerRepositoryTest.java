@@ -10,9 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,16 +26,16 @@ class BeerRepositoryTest {
 
     @Test
     void testGerBeerListByBeerStyle() {
-        List<Beer> beerList = beerRepository.findAllByBeerStyle(BeerStyle.IPA);
+        Page<Beer> beerPage = beerRepository.findAllByBeerStyle(BeerStyle.IPA, null);
 
-        assertThat(beerList.size()).isEqualTo(547);
+        assertThat(beerPage.getContent().size()).isEqualTo(547);
     }
 
     @Test
     void testGetBeerListByName() {
-        List<Beer> list = beerRepository.findAllByBeerNameIsLikeIgnoreCase("%IPA%");
+        Page<Beer> list = beerRepository.findAllByBeerNameIsLikeIgnoreCase("%IPA%", null);
 
-        assertThat(list.size()).isEqualTo(336);
+        assertThat(list.getContent().size()).isEqualTo(336);
     }
 
     @Test
@@ -43,7 +43,8 @@ class BeerRepositoryTest {
 
         assertThrows(ConstraintViolationException.class, () -> {
             Beer savedBeer = beerRepository.save(Beer.builder()
-                                                         .beerName("My Beer 322094423094832903220944230948329032209442309483290322094423094832903220944230948329032209442309483290322094423094832903220944230948329032209442309483290")
+                                                         .beerName(
+                                                                 "My Beer 322094423094832903220944230948329032209442309483290322094423094832903220944230948329032209442309483290322094423094832903220944230948329032209442309483290")
                                                          .beerStyle(BeerStyle.PALE_ALE)
                                                          .upc("2131242")
                                                          .price(new BigDecimal("11.88"))
