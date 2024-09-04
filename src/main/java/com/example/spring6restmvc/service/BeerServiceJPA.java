@@ -8,6 +8,7 @@ import com.example.spring6restmvc.repository.BeerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
@@ -31,6 +32,7 @@ public class BeerServiceJPA implements BeerService {
 
     private final BeerRepository beerRepository;
     private final BeerMapper beerMapper;
+    private final CacheManager cacheManager;
 
 
     @Override
@@ -124,6 +126,8 @@ public class BeerServiceJPA implements BeerService {
 
     @Override
     public Boolean deleteById(UUID beerId) {
+        cacheManager.getCache("beerCache").evict(beerId);
+        cacheManager.getCache("beerListCache").clear();
         if (beerRepository.existsById(beerId)) {
             beerRepository.deleteById(beerId);
             return true;
