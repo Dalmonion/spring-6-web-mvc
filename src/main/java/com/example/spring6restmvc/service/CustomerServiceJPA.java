@@ -5,6 +5,7 @@ import com.example.spring6restmvc.model.CustomerDTO;
 import com.example.spring6restmvc.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,7 @@ public class CustomerServiceJPA implements CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
 
+    @Cacheable(cacheNames = "customerListCache")
     @Override
     public List<CustomerDTO> listCustomers() {
         return customerRepository.findAll().stream()
@@ -28,6 +30,7 @@ public class CustomerServiceJPA implements CustomerService {
                 .toList();
     }
 
+    @Cacheable(cacheNames = "customerCache")
     @Override
     public Optional<CustomerDTO> getCustomerById(UUID customerId) {
         return Optional.ofNullable(customerMapper.customerToCustomerDto(
