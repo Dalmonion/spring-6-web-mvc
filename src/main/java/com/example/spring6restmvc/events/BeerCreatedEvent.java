@@ -1,0 +1,19 @@
+package com.example.spring6restmvc.events;
+
+import com.example.spring6restmvc.entity.Beer;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+import org.springframework.security.core.Authentication;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@Builder
+public class BeerCreatedEvent {
+
+    private Beer beer;
+    private Authentication authentication;
+}
