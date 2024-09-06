@@ -2,6 +2,9 @@ package com.example.spring6restmvc.service;
 
 import com.example.spring6restmvc.entity.Beer;
 import com.example.spring6restmvc.events.BeerCreatedEvent;
+import com.example.spring6restmvc.events.BeerDeletedEvent;
+import com.example.spring6restmvc.events.BeerPatchedEvent;
+import com.example.spring6restmvc.events.BeerUpdatedEvent;
 import com.example.spring6restmvc.mapper.BeerMapper;
 import com.example.spring6restmvc.model.BeerDTO;
 import com.example.spring6restmvc.model.BeerStyle;
@@ -132,6 +135,10 @@ public class BeerServiceJPA implements BeerService {
             foundedBeer.setUpc(beer.getUpc());
             foundedBeer.setQuantityOnHand(beer.getQuantityOnHand());
 
+            val savedBeer = beerRepository.save(foundedBeer);
+            val auth = SecurityContextHolder.getContext().getAuthentication();
+            applicationEventPublisher.publishEvent(new BeerUpdatedEvent(savedBeer, auth));
+
             atomicReference.set(Optional.of(beerMapper
                                                     .beerToBeerDto(beerRepository.save(foundedBeer))));
         }, () -> {
@@ -145,6 +152,9 @@ public class BeerServiceJPA implements BeerService {
         cacheManager.getCache("beerCache").evict(beerId);
         cacheManager.getCache("beerListCache").clear();
         if (beerRepository.existsById(beerId)) {
+            val auth = SecurityContextHolder.getContext().getAuthentication();
+            applicationEventPublisher.publishEvent(new BeerDeletedEvent(Beer.builder().id(beerId).build(), auth));
+
             beerRepository.deleteById(beerId);
             return true;
         }
@@ -172,6 +182,9 @@ public class BeerServiceJPA implements BeerService {
                 foundedBeer.setQuantityOnHand(beer.getQuantityOnHand());
             }
 
+            val savedBeer = beerRepository.save(foundedBeer);
+            val auth = SecurityContextHolder.getContext().getAuthentication();
+            applicationEventPublisher.publishEvent(new BeerPatchedEvent(savedBeer, auth));
             atomicReference.set(Optional.of(beerMapper
                                                     .beerToBeerDto(beerRepository.save(foundedBeer))));
         }, () -> {
