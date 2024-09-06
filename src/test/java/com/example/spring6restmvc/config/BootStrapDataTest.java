@@ -1,6 +1,6 @@
 package com.example.spring6restmvc.config;
 
-import com.example.spring6restmvc.entity.Customer;
+import com.example.spring6restmvc.repository.BeerOrderRepository;
 import com.example.spring6restmvc.repository.BeerRepository;
 import com.example.spring6restmvc.repository.CustomerRepository;
 import com.example.spring6restmvc.service.BeerCsvService;
@@ -25,13 +25,16 @@ class BootStrapDataTest {
     CustomerRepository customerRepository;
 
     @Autowired
+    BeerOrderRepository beerOrderRepository;
+
+    @Autowired
     BeerCsvService csvService;
 
     BootStrapData bootStrapData;
 
     @BeforeEach
     void setUp() {
-        bootStrapData = new BootStrapData(beerRepository, customerRepository, csvService);
+        bootStrapData = new BootStrapData(beerRepository, customerRepository, csvService, beerOrderRepository);
     }
 
     @Test

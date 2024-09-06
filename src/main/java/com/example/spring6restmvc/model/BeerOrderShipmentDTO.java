@@ -1,5 +1,6 @@
 package com.example.spring6restmvc.model;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;
 
@@ -14,6 +15,7 @@ public class BeerOrderShipmentDTO {
     private Long version;
     private Timestamp createdDate;
     private Timestamp lastModifiedDate;
-    private BeerOrderDTO beerOrder;
+
+    @NotBlank
     private String trackingNumber;
 }

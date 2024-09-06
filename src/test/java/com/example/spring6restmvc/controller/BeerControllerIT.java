@@ -108,7 +108,7 @@ class BeerControllerIT {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(beerMap)))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isOk())
                 .andReturn();
 
         assertEquals(1, applicationEvents

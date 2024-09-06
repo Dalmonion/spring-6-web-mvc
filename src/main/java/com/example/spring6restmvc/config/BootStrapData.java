@@ -1,14 +1,18 @@
 package com.example.spring6restmvc.config;
 
 import com.example.spring6restmvc.entity.Beer;
+import com.example.spring6restmvc.entity.BeerOrder;
+import com.example.spring6restmvc.entity.BeerOrderLine;
 import com.example.spring6restmvc.entity.Customer;
 import com.example.spring6restmvc.model.BeerCSVRecord;
 import com.example.spring6restmvc.model.BeerStyle;
+import com.example.spring6restmvc.repository.BeerOrderRepository;
 import com.example.spring6restmvc.repository.BeerRepository;
 import com.example.spring6restmvc.repository.CustomerRepository;
 import com.example.spring6restmvc.service.BeerCsvService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 
 import org.springframework.boot.CommandLineRunner;
@@ -20,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -28,6 +33,7 @@ public class BootStrapData implements CommandLineRunner {
     private final BeerRepository beerRepository;
     private final CustomerRepository customerRepository;
     private final BeerCsvService beerCsvService;
+    private final BeerOrderRepository beerOrderRepository;
 
     @Transactional
     @Override
@@ -35,6 +41,36 @@ public class BootStrapData implements CommandLineRunner {
         loadBeerData();
         loadCustomerData();
         loadCsvData();
+        loadOrderData();
+    }
+
+    private void loadOrderData() {
+        if (beerOrderRepository.count() == 0) {
+            val customer = customerRepository.findAll();
+            val beers = beerRepository.findAll();
+
+            val beerIterator = beers.iterator();
+
+            for (Customer customer1 : customer) {
+                Beer beer1 = beerIterator.next();
+                Beer beer2 = beerIterator.next();
+
+                val beerOrder = BeerOrder.builder()
+                        .customer(customer1)
+                        .beerOrderLines(Set.of(
+                                BeerOrderLine.builder()
+                                        .beer(beer1)
+                                        .orderQuantity(1)
+                                        .build(),
+                                BeerOrderLine.builder()
+                                        .beer(beer2)
+                                        .orderQuantity(2)
+                                        .build()
+                        ))
+                        .build();
+                beerOrderRepository.save(beerOrder);
+            }
+        }
     }
 
     private void loadCsvData() throws FileNotFoundException {

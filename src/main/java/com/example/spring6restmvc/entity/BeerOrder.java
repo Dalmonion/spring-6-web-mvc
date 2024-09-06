@@ -9,7 +9,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Version;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,7 +38,7 @@ public class BeerOrder {
         this.lastModifiedDate = lastModifiedDate;
         this.customerRef = customerRef;
         this.setCustomer(customer);
-        this.beerOrderLines = beerOrderLines;
+        this.setBeerOrderLines(beerOrderLines);
         this.setBeerOrderShipment(beerOrderShipment);
     }
 
@@ -72,19 +71,31 @@ public class BeerOrder {
     @ManyToOne
     private Customer customer;
 
-    @OneToMany(mappedBy = "beerOrder")
+    @OneToMany(mappedBy = "beerOrder", cascade = CascadeType.ALL)
     private Set<BeerOrderLine> beerOrderLines;
 
     @OneToOne(cascade = CascadeType.PERSIST)
     private BeerOrderShipment beerOrderShipment;
 
     private void setCustomer(Customer customer) {
-        this.customer = customer;
-        customer.getBeerOrders().add(this);
+        if (customer != null) {
+            this.customer = customer;
+            customer.getBeerOrders().add(this);
+        }
     }
 
     private void setBeerOrderShipment(BeerOrderShipment beerOrderShipment) {
-        this.beerOrderShipment = beerOrderShipment;
-        beerOrderShipment.setBeerOrder(this);
+        if (beerOrderShipment != null) {
+            this.beerOrderShipment = beerOrderShipment;
+            beerOrderShipment.setBeerOrder(this);
+        }
+    }
+
+    private void setBeerOrderLines(Set<BeerOrderLine> beerOrderLines) {
+        if (beerOrderLines != null) {
+            this.beerOrderLines = beerOrderLines;
+            beerOrderLines.forEach(beerOrderLine -> beerOrderLine.setBeerOrder(this));
+
+        }
     }
 }
