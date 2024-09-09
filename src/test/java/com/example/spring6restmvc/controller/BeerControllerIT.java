@@ -8,6 +8,7 @@ import com.example.spring6restmvc.events.BeerUpdatedEvent;
 import com.example.spring6restmvc.mapper.BeerMapper;
 import com.example.spring6restmvc.model.BeerDTO;
 import com.example.spring6restmvc.model.BeerStyle;
+import com.example.spring6restmvc.repository.BeerOrderRepository;
 import com.example.spring6restmvc.repository.BeerRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -61,6 +62,9 @@ class BeerControllerIT {
     private BeerRepository beerRepository;
 
     @Autowired
+    private BeerOrderRepository beerOrderRepository;
+
+    @Autowired
     private BeerMapper beerMapper;
 
     @Autowired
@@ -108,7 +112,7 @@ class BeerControllerIT {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(beerMap)))
-                .andExpect(status().isOk())
+                .andExpect(status().isNoContent())
                 .andReturn();
 
         assertEquals(1, applicationEvents
@@ -118,7 +122,12 @@ class BeerControllerIT {
 
     @Test
     void testDeleteBeerByIdNotFoundMVC() throws Exception {
-        Beer beer = beerRepository.findAll().get(0);
+        Beer beer = beerRepository.save(Beer.builder()
+                                                .beerName("new Beer")
+                                                .beerStyle(BeerStyle.IPA)
+                                                .upc("123123")
+                                                .price(BigDecimal.TEN)
+                                                .build());
 
         mockMvc.perform(delete(BeerController.BEER_PATH_ID, beer.getId())
                                 .with(BeerControllerTest.jwtRequestPostProcessors)
@@ -286,7 +295,12 @@ class BeerControllerIT {
     @Transactional
     @Test
     void testDeleteBeerById() {
-        Beer beer = beerRepository.findAll().get(0);
+        Beer beer = beerRepository.save(Beer.builder()
+                                                .beerName("new Beer")
+                                                .beerStyle(BeerStyle.IPA)
+                                                .upc("123123")
+                                                .price(BigDecimal.TEN)
+                                                .build());
 
         ResponseEntity responseEntity = beerController.deleteById(beer.getId());
 
@@ -368,6 +382,7 @@ class BeerControllerIT {
     @Transactional
     @Test
     void testGetEmptyBeerList() {
+        beerOrderRepository.deleteAll();
         beerRepository.deleteAll();
         Page<BeerDTO> dtos = beerController.listBears(null, null, false, 1, 25);
 
