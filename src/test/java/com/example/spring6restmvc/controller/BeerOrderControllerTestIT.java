@@ -2,10 +2,14 @@ package com.example.spring6restmvc.controller;
 
 import com.example.spring6restmvc.model.BeerOrderCreateDTO;
 import com.example.spring6restmvc.model.BeerOrderLineCreateDTO;
+import com.example.spring6restmvc.model.BeerOrderLineUpdateDTO;
+import com.example.spring6restmvc.model.BeerOrderShipmentUpdateDTO;
+import com.example.spring6restmvc.model.BeerOrderUpdateDTO;
 import com.example.spring6restmvc.repository.BeerOrderRepository;
 import com.example.spring6restmvc.repository.BeerRepository;
 import com.example.spring6restmvc.repository.CustomerRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.greaterThan;
@@ -23,6 +28,7 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -52,6 +58,39 @@ class BeerOrderControllerTestIT {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
                 .build();
+    }
+
+    @Transactional
+    @Test
+    void testUpdateBeerOrder() throws Exception {
+        val beerOrder = beerOrderRepository.findAll().get(0);
+
+        Set<BeerOrderLineUpdateDTO> lineUpdateDTOs = new HashSet<>();
+
+        beerOrder.getBeerOrderLines().forEach(beerOrderLine -> {
+            lineUpdateDTOs.add(BeerOrderLineUpdateDTO.builder()
+                                       .id(beerOrderLine.getId())
+                                       .beerId(beerOrderLine.getBeer().getId())
+                                       .orderQuantity(beerOrderLine.getOrderQuantity())
+                                       .quantityAllocated(beerOrderLine.getQuantityAllocated())
+                                       .build());
+        });
+
+        val beerOrderUpdateDTO = BeerOrderUpdateDTO.builder()
+                .customerId(beerOrder.getCustomer().getId())
+                .customerRef("TestRef")
+                .beerOrderLines(lineUpdateDTOs)
+                .beerOrderShipment(BeerOrderShipmentUpdateDTO.builder()
+                                           .tackingNumber("123456")
+                                           .build())
+                .build();
+
+        mockMvc.perform(put(BeerOrderController.BEER_ORDER_PATH_ID, beerOrder.getId())
+                                .contentType("application/json")
+                                .content(objectMapper.writeValueAsString(beerOrderUpdateDTO))
+                                .with(BeerControllerTest.jwtRequestPostProcessors))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.customerRef", is("TestRef")));
     }
 
     @Test

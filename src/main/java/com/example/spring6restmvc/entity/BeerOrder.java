@@ -77,14 +77,14 @@ public class BeerOrder {
     @OneToOne(cascade = CascadeType.PERSIST)
     private BeerOrderShipment beerOrderShipment;
 
-    private void setCustomer(Customer customer) {
+    public void setCustomer(Customer customer) {
         if (customer != null) {
             this.customer = customer;
             customer.getBeerOrders().add(this);
         }
     }
 
-    private void setBeerOrderShipment(BeerOrderShipment beerOrderShipment) {
+    public void setBeerOrderShipment(BeerOrderShipment beerOrderShipment) {
         if (beerOrderShipment != null) {
             this.beerOrderShipment = beerOrderShipment;
             beerOrderShipment.setBeerOrder(this);

@@ -3,6 +3,7 @@ package com.example.spring6restmvc.service;
 import com.example.spring6restmvc.entity.BeerOrder;
 import com.example.spring6restmvc.model.BeerOrderCreateDTO;
 import com.example.spring6restmvc.model.BeerOrderDTO;
+import com.example.spring6restmvc.model.BeerOrderUpdateDTO;
 
 import org.springframework.data.domain.Page;
 
@@ -16,6 +17,8 @@ public interface BeerOrderService {
     Optional<BeerOrderDTO> getBeerOrderById(UUID beerOrderId);
 
     BeerOrder createOrder(BeerOrderCreateDTO beerOrderCreateDTO);
+
+    BeerOrderDTO updateOrder(UUID beerOrderId, BeerOrderUpdateDTO beerOrderUpdateDTO);
 
 //    BeerOrderDTO saveNewBeerOrder(BeerOrderDTO beerOrder);
 //    Optional<BeerOrderDTO> updateBeerOrderById(UUID beerOrderId, BeerOrderDTO beerOrder);
