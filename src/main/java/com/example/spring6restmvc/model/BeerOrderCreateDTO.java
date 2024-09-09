@@ -14,6 +14,6 @@ public class BeerOrderCreateDTO {
     private String customerRef;
 
     @NotNull
-    private UUID customer;
+    private UUID customerId;
     private Set<BeerOrderLineCreateDTO> beerOrderLines;
 }
