@@ -124,4 +124,13 @@ public class BeerOrderServiceJPA implements BeerOrderService {
 
         return beerOrderMapper.toBeerOrderDTO(beerOrderRepository.save(order));
     }
+
+    @Override
+    public void deleteOrder(UUID beerOrderId) {
+        if (beerOrderRepository.existsById(beerOrderId)) {
+            beerOrderRepository.deleteById(beerOrderId);
+        } else {
+            throw new NotFoundException();
+        }
+    }
 }
